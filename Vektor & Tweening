@@ -1,0 +1,183 @@
+#include <windows.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#include <stdlib.h>
+
+void myInit(void)
+ {
+    glClearColor(0.9,0.9,0.9,0.9);
+    glColor3f(0.0f, 0.0f, 0.0f);
+ 	glPointSize(4.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0.0, 800.0, 0.0, 400.0);
+}
+
+class GLintPoint
+{
+public:
+		GLint x, y;
+};
+
+class Point2
+{
+public:
+	float x,y;
+	void set(float dx,float dy)
+	{
+		x = dx;
+		y = dy;
+	}
+	void set(Point2 &p)
+	{
+		x = p.x;
+		y = p.y;
+	}
+	Point2(float xx,float yy)
+	{
+		x = xx;
+		y = yy;
+	}
+	Point2()
+	{
+		x = y = 0;
+	}
+};
+
+GLintPoint CP;
+
+float lerp (float a, float b, float t)
+{
+	return a + (b - a) *t;
+}
+
+Point2 Tween(Point2 A, Point2 B ,float t)
+	{
+		Point2 P;
+		P.x = lerp(A.x,B.x,t);
+		P.y = lerp(A.y,B.y,t);
+		return P;
+	}
+
+void moveTo(GLint x ,GLint y)
+{
+	CP.x = x; CP.y = y;
+}
+
+void lineTo(GLint x ,GLint y)
+{
+	glBegin (GL_LINES);
+	glVertex2i(CP.x,CP.y);
+	glVertex2i(x,y);
+	glEnd();
+	glutSwapBuffers();
+	CP.x = x; CP.y = y;
+}
+
+void drawTween (Point2 A[], Point2 B[], int n, float t)
+{
+     for (int i = 0; i < n; i++)
+     {
+        Point2 P;
+        P = Tween (A[i], B[i], t);
+        if (i == 0) moveTo (P.x, P.y);
+        else lineTo (P.x, P.y);
+       }
+}
+
+void myDisplay(void)
+{
+	int x;
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.0,0.0,1.0);
+
+	Point2 A[28];
+		A [0].set(35,120);
+		A [1].set(50,120);
+		A [2].set(80,150);
+		A [3].set(75,180);
+		A [4].set(105,150);
+		A [5].set(75,120);
+		A [6].set(90,120);
+		A [7].set(120,150);
+		A [8].set(90,180);
+		A [9].set(90,250);
+		A [10].set(120,320);
+		A [11].set(110,330);
+		A [12].set(90,270);
+		A [13].set(80,270);
+		A [14].set(90,280);
+		A [15].set(90,300);
+		A [16].set(85,310);
+		A [17].set(75,310);
+		A [18].set(70,300);
+		A [19].set(70,280);
+		A [20].set(75,270);
+		A [21].set(65,270);
+		A [22].set(30,210);
+		A [23].set(40,200);
+		A [24].set(60,250);
+		A [25].set(60,180);
+		A [26].set(65,150);
+		A [27].set(35,120);
+
+	Point2 B[28];
+		B [0].set(635,120);
+		B [1].set(650,120);
+		B [2].set(635,150);
+		B [3].set(675,180);
+		B [4].set(660,150);
+		B [5].set(675,120);
+		B [6].set(690,120);
+		B [7].set(675,150);
+		B [8].set(690,180);
+		B [9].set(690,250);
+		B [10].set(710,200);
+		B [11].set(720,210);
+		B [12].set(690,270);
+		B [13].set(680,270);
+		B [14].set(690,280);
+		B [15].set(690,300);
+		B [16].set(685,310);
+		B [17].set(675,310);
+		B [18].set(670,300);
+		B [19].set(670,280);
+		B [20].set(675,270);
+		B [21].set(665,270);
+		B [22].set(630,330);
+		B [23].set(620,320);
+		B [24].set(660,250);
+		B [25].set(660,180);
+		B [26].set(620,150);
+		B [27].set(635,120);
+
+	glColor3f(1,0,0);
+	drawTween(A,B,28,0.0);
+
+	glColor3f(0,0,1);
+	for(x=1;x<=9;x+=1)
+	{
+		drawTween(A,B,28,0.1*x);
+	}
+
+	glColor3f(1,0,0);
+	drawTween(A,B,28,0.991);
+
+	glFlush();
+	glutSwapBuffers();
+}
+
+main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE| GLUT_RGB);
+	glutInitWindowSize(800,400);
+	glutInitWindowPosition(100,150);
+	glutCreateWindow("Inbetween (672019114)");
+	glutDisplayFunc(myDisplay);
+	myInit();
+	glutMainLoop();
+}
